@@ -29,4 +29,4 @@ COPY --from=build-env /app/out .
 EXPOSE 80
 
 # Starting the APO
-ENTRYPOINT ["dotnet", "account-api.dll"]
+ENTRYPOINT ["dotnet", "SaveTrackApi.dll"]
