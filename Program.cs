@@ -67,7 +67,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: Origin,
                       policy =>
                       {
-                          policy.WithOrigins("http://localhost:7000")
+                          policy.WithOrigins("http://localhost:7000", "https://savetrackdev.craftmatrix.org", "https://savetrack.craftmatrix.org")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod()
                                 .AllowCredentials();
