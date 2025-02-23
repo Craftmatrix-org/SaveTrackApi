@@ -4,6 +4,7 @@ using Craftmatrix.org.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SaveTrackApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250223111921_Adding Budget Item as parent to budge table")]
+    partial class AddingBudgetItemasparenttobudgetable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,7 +111,7 @@ namespace SaveTrackApi.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("BudgetItems");
+                    b.ToTable("BudgetItemDto");
                 });
 
             modelBuilder.Entity("Craftmatrix.org.Model.CategoryDto", b =>
@@ -141,7 +144,7 @@ namespace SaveTrackApi.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Categories");
+                    b.ToTable("CategoryDto");
                 });
 
             modelBuilder.Entity("Craftmatrix.org.Model.TransactionDto", b =>
@@ -184,7 +187,7 @@ namespace SaveTrackApi.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("TransactionDto");
                 });
 
             modelBuilder.Entity("Craftmatrix.org.Model.UserDto", b =>

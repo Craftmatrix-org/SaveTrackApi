@@ -11,8 +11,11 @@ namespace Craftmatrix.org.Data
 
         public DbSet<UserDto> Users { get; set; }
         public DbSet<AccountDto> Accounts { get; set; }
-        // Add DbSet properties for your entities here
-        // public DbSet<YourEntity> YourEntities { get; set; }
+        public DbSet<CategoryDto> Categories { get; set; }
+        public DbSet<TransactionDto> Transactions { get; set; }
+        public DbSet<BudgetDto> Budgets { get; set; }
+        public DbSet<BudgetItemDto> BudgetItems { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,6 +48,24 @@ namespace Craftmatrix.org.Data
                 .HasOne<CategoryDto>()
                 .WithMany()
                 .HasForeignKey(u => u.CategoryID)
+                .HasPrincipalKey(u => u.Id);
+
+            modelBuilder.Entity<BudgetDto>()
+            .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(b => b.UserID)
+                .HasPrincipalKey(u => u.Id);
+
+            modelBuilder.Entity<BudgetItemDto>()
+            .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(b => b.UserID)
+                .HasPrincipalKey(u => u.Id);
+
+            modelBuilder.Entity<BudgetItemDto>()
+            .HasOne<BudgetDto>()
+                .WithMany()
+                .HasForeignKey(b => b.BudgetID)
                 .HasPrincipalKey(u => u.Id);
         }
     }

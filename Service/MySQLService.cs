@@ -62,7 +62,7 @@ namespace Craftmatrix.org.Services
             return await ((IQueryable<TDto>)dbSet).ToListAsync();
         }
 
-        public async Task<TDto> PutDataAsync<TDto>(string tableName, int id, TDto dto) where TDto : class
+        public async Task<TDto> PutDataAsync<TDto>(string tableName, dynamic id, TDto dto) where TDto : class
         {
             var dbSetProperty = _context.GetType().GetProperties()
                 .FirstOrDefault(p => p.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase) && p.PropertyType.IsGenericType &&
@@ -88,7 +88,7 @@ namespace Craftmatrix.org.Services
             return dto;
         }
 
-        public async Task<bool> DeleteDataAsync(string tableName, int id)
+        public async Task<bool> DeleteDataAsync(string tableName, object id)
         {
             var dbSetProperty = _context.GetType().GetProperties()
                 .FirstOrDefault(p => p.Name.Equals(tableName, StringComparison.OrdinalIgnoreCase) && p.PropertyType.IsGenericType &&

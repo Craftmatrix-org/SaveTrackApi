@@ -4,6 +4,7 @@ using Craftmatrix.org.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SaveTrackApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250223111641_Adding Budget Table")]
+    partial class AddingBudgetTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,38 +82,6 @@ namespace SaveTrackApi.Migrations
                     b.ToTable("Budgets");
                 });
 
-            modelBuilder.Entity("Craftmatrix.org.Model.BudgetItemDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<int>("Amount")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("BudgetID")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BudgetID");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("BudgetItems");
-                });
-
             modelBuilder.Entity("Craftmatrix.org.Model.CategoryDto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -141,7 +112,7 @@ namespace SaveTrackApi.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Categories");
+                    b.ToTable("CategoryDto");
                 });
 
             modelBuilder.Entity("Craftmatrix.org.Model.TransactionDto", b =>
@@ -184,7 +155,7 @@ namespace SaveTrackApi.Migrations
 
                     b.HasIndex("UserID");
 
-                    b.ToTable("Transactions");
+                    b.ToTable("TransactionDto");
                 });
 
             modelBuilder.Entity("Craftmatrix.org.Model.UserDto", b =>
@@ -213,21 +184,6 @@ namespace SaveTrackApi.Migrations
 
             modelBuilder.Entity("Craftmatrix.org.Model.BudgetDto", b =>
                 {
-                    b.HasOne("Craftmatrix.org.Model.UserDto", null)
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Craftmatrix.org.Model.BudgetItemDto", b =>
-                {
-                    b.HasOne("Craftmatrix.org.Model.BudgetDto", null)
-                        .WithMany()
-                        .HasForeignKey("BudgetID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Craftmatrix.org.Model.UserDto", null)
                         .WithMany()
                         .HasForeignKey("UserID")

@@ -34,10 +34,13 @@ namespace Craftmatrix.org.Controllers
                 await _mysqlservice.PostDataAsync<UserDto>("Users", userDto);
             }
 
+            var afterPost = await _mysqlservice.GetDataAsync<UserDto>("Users");
+            var userAfterPost = afterPost.FirstOrDefault(u => u.Email == email);
+
             JWTDto jWTDto = new JWTDto
             {
                 email = email,
-                Uid = user.Id,
+                Uid = userAfterPost.Id,
             };
 
             var token = _jwtService.GenerateToken(jWTDto);
