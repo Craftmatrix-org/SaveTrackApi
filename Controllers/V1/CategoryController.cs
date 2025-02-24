@@ -22,8 +22,15 @@ namespace Craftmatrix.org.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCategories()
         {
-            var categories = await _mysqlservice.GetDataAsync<CategoryDto>("");
+            var categories = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
             return Ok(categories);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryDto category)
+        {
+            await _mysqlservice.PostDataAsync<CategoryDto>("Categories", category);
+            return Ok(category);
         }
     }
 }
