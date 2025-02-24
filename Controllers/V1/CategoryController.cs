@@ -26,10 +26,35 @@ namespace Craftmatrix.org.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("{uid}")]
+        public async Task<IActionResult> GetCategory(Guid uid)
+        {
+            var category = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var filtered = category.Where(c => c.UserID == uid);
+            return Ok(filtered);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto category)
         {
+            category.CreatedAt = DateTime.UtcNow;
+            category.UpdatedAt = DateTime.UtcNow;
             await _mysqlservice.PostDataAsync<CategoryDto>("Categories", category);
+            return Ok(category);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto category)
+        {
+            category.UpdatedAt = DateTime.UtcNow;
+            await _mysqlservice.PutDataAsync<CategoryDto>("Categories", category.Id, category);
+            return Ok(category);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCategory([FromBody] CategoryDto category)
+        {
+            await _mysqlservice.DeleteDataAsync("Categories", category.Id);
             return Ok(category);
         }
     }

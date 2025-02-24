@@ -37,6 +37,18 @@ namespace Craftmatrix.org.Controllers
             return Ok(iam);
         }
 
+        [HttpGet("specific/{id}")]
+        public async Task<IActionResult> GetSpecific(Guid id)
+        {
+            var account = await _mysqlservice.GetDataAsync<AccountDto>("Accounts");
+            var iam = account.Where(e => e.Id == id).ToList();
+            if (iam == null)
+            {
+                return NotFound();
+            }
+            return Ok(iam);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] AccountDto account)
         {
