@@ -26,6 +26,14 @@ namespace Craftmatrix.org.Controllers
             return Ok(categories);
         }
 
+        [HttpGet("specific/{id}")]
+        public async Task<IActionResult> GetSpecialCategories(Guid id)
+        {
+            var categories = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var filtered = categories.Where(c => c.Id == id);
+            return Ok(filtered);
+        }
+
         [HttpGet("{uid}")]
         public async Task<IActionResult> GetCategory(Guid uid)
         {
@@ -37,25 +45,38 @@ namespace Craftmatrix.org.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateCategory([FromBody] CategoryDto category)
         {
+            category.Id = Guid.NewGuid();
             category.CreatedAt = DateTime.UtcNow;
             category.UpdatedAt = DateTime.UtcNow;
             await _mysqlservice.PostDataAsync<CategoryDto>("Categories", category);
             return Ok(category);
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory([FromBody] CategoryDto category)
         {
+            var categoryList = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var checkCategory = categoryList.FirstOrDefault(c => c.Id == category.Id);
+            if (checkCategory == null)
+            {
+                return NotFound();
+            }
             category.UpdatedAt = DateTime.UtcNow;
             await _mysqlservice.PutDataAsync<CategoryDto>("Categories", category.Id, category);
             return Ok(category);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> DeleteCategory([FromBody] CategoryDto category)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(Guid id)
         {
-            await _mysqlservice.DeleteDataAsync("Categories", category.Id);
-            return Ok(category);
+            var categoryList = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var checkCategory = categoryList.FirstOrDefault(c => c.Id == id);
+            if (checkCategory == null)
+            {
+                return NotFound();
+            }
+            await _mysqlservice.DeleteDataAsync("Categories", id);
+            return Ok("Successfully deleted");
         }
     }
 }
