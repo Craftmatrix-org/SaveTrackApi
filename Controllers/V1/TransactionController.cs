@@ -26,6 +26,14 @@ namespace Craftmatrix.org.Controllers
             return Ok(transactions);
         }
 
+        [HttpGet("specific/{id}")]
+        public async Task<IActionResult> GetTransactions(Guid id)
+        {
+            var transactions = await _mysqlservice.GetDataAsync<TransactionDto>("Transactions");
+            var filter = transactions.Where(t => t.Id == id);
+            return Ok(filter);
+        }
+
         [HttpGet("{uid}")]
         public async Task<IActionResult> GetTransaction(Guid uid)
         {
@@ -51,7 +59,7 @@ namespace Craftmatrix.org.Controllers
             return Ok(result);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTransaction(Guid id)
         {
             var result = await _mysqlservice.DeleteDataAsync("Transactions", id);
