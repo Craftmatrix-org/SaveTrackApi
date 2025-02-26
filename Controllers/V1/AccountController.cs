@@ -28,13 +28,34 @@ namespace Craftmatrix.org.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> Get(Guid id)
         {
-            var account = await _mysqlservice.GetDataAsync<AccountDto>("Accounts");
-            var iam = account.Where(e => e.UserID == id).OrderByDescending(e => e.UpdatedAt).ToList();
-            if (iam == null)
+            var accounts = await _mysqlservice.GetDataAsync<AccountDto>("Accounts");
+            var transactions = await _mysqlservice.GetDataAsync<TransactionDto>("Transactions");
+            var categories = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var accountList = accounts.Where(e => e.UserID == id).OrderByDescending(e => e.UpdatedAt).ToList();
+            if (accountList == null || !accountList.Any())
             {
                 return NotFound();
             }
-            return Ok(iam);
+
+            var result = accountList.Select(account => new
+            {
+                account.Id,
+                account.UserID,
+                account.Label,
+                account.Description,
+                account.InitValue,
+                account.CreatedAt,
+                account.UpdatedAt,
+                Total = account.InitValue + transactions
+                    .Where(t => t.AccountID == account.Id)
+                    .Sum(t =>
+                    {
+                        var category = categories.FirstOrDefault(c => c.Id == t.CategoryID);
+                        return category != null && category.isPositive ? t.Amount : -t.Amount;
+                    })
+            });
+
+            return Ok(result);
         }
 
         [HttpGet("specific/{id}")]
