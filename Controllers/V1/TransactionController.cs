@@ -38,7 +38,22 @@ namespace Craftmatrix.org.Controllers
         public async Task<IActionResult> GetTransaction(Guid uid)
         {
             var transactions = await _mysqlservice.GetDataAsync<TransactionDto>("Transactions");
-            var filter = transactions.Where(t => t.UserID == uid);
+            var category = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var filter = transactions
+                         .Where(t => t.UserID == uid)
+                         .OrderByDescending(t => t.CreatedAt)
+                         .Select(t => new
+                         {
+                             t.Id,
+                             t.Description,
+                             t.UserID,
+                             t.Amount,
+                             t.CategoryID,
+                             t.AccountID,
+                             t.CreatedAt,
+                             t.UpdatedAt,
+                             IsPositive = category.FirstOrDefault(c => c.Id == t.CategoryID)?.isPositive
+                         });
             return Ok(filter);
         }
 
