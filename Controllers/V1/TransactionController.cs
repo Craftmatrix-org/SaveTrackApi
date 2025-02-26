@@ -50,8 +50,8 @@ namespace Craftmatrix.org.Controllers
                              t.Amount,
                              t.CategoryID,
                              t.AccountID,
-                             t.CreatedAt,
-                             t.UpdatedAt,
+                             CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(t.CreatedAt, TimeZoneInfo.Local),
+                             UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(t.UpdatedAt, TimeZoneInfo.Local),
                              IsPositive = category.FirstOrDefault(c => c.Id == t.CategoryID)?.isPositive
                          });
             return Ok(filter);
