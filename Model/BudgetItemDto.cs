@@ -8,5 +8,7 @@ namespace Craftmatrix.org.Model
         public Guid UserID { get; set; }
         public Guid BudgetID { get; set; }
         public int Amount { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
     }
 }
