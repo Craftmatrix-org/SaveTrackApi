@@ -130,6 +130,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Craftmatrix API v1");
         options.SwaggerEndpoint("/swagger/v2/swagger.json", "Craftmatrix API v2");
+        options.InjectStylesheet("/swagger-ui/custom.css");
         // options.RoutePrefix = ""; // Optional: Make Swagger UI available at root
     });
 }
@@ -142,5 +143,6 @@ app.UseHttpsRedirection();
 app.MapControllers();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 
 app.Run();
