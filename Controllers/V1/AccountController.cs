@@ -29,7 +29,7 @@ namespace Craftmatrix.org.Controllers
         public async Task<IActionResult> Get(Guid id)
         {
             var account = await _mysqlservice.GetDataAsync<AccountDto>("Accounts");
-            var iam = account.Where(e => e.UserID == id).ToList();
+            var iam = account.Where(e => e.UserID == id).OrderByDescending(e => e.UpdatedAt).ToList();
             if (iam == null)
             {
                 return NotFound();
