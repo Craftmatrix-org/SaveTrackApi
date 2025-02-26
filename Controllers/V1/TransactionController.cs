@@ -45,6 +45,7 @@ namespace Craftmatrix.org.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateTransaction([FromBody] TransactionDto transaction)
         {
+            transaction.Id = Guid.NewGuid();
             transaction.CreatedAt = DateTime.UtcNow;
             transaction.UpdatedAt = DateTime.UtcNow;
             var result = await _mysqlservice.PostDataAsync<TransactionDto>("Transactions", transaction);
