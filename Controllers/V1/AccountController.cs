@@ -55,7 +55,8 @@ namespace Craftmatrix.org.Controllers
                     })
             });
 
-            return Ok(result);
+            var orderedResult = result.OrderByDescending(r => r.Total);
+            return Ok(orderedResult);
         }
 
         [HttpGet("specific/{id}")]
