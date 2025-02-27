@@ -34,11 +34,13 @@ namespace Craftmatrix.org.Controllers
             return Ok(filter);
         }
 
+        // ("87779a89-eb5d-4610-9375-687287915607")
         [HttpGet("{uid}")]
         public async Task<IActionResult> GetTransaction(Guid uid)
         {
             var transactions = await _mysqlservice.GetDataAsync<TransactionDto>("Transactions");
             var category = await _mysqlservice.GetDataAsync<CategoryDto>("Categories");
+            var account = await _mysqlservice.GetDataAsync<AccountDto>("Accounts");
             var filter = transactions
                          .Where(t => t.UserID == uid)
                          .OrderByDescending(t => t.CreatedAt)
@@ -52,7 +54,8 @@ namespace Craftmatrix.org.Controllers
                              t.AccountID,
                              CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(t.CreatedAt, TimeZoneInfo.Local),
                              UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(t.UpdatedAt, TimeZoneInfo.Local),
-                             IsPositive = category.FirstOrDefault(c => c.Id == t.CategoryID)?.isPositive
+                             IsPositive = category.FirstOrDefault(c => c.Id == t.CategoryID)?.isPositive,
+                             Concat = $"You used {account.FirstOrDefault(a => a.Id == t.AccountID)?.Label} in {category.FirstOrDefault(c => c.Id == t.CategoryID)?.Name}",
                          });
             return Ok(filter);
         }
