@@ -16,57 +16,63 @@ namespace Craftmatrix.org.Data
         public DbSet<BudgetDto> Budgets { get; set; }
         public DbSet<BudgetItemDto> BudgetItems { get; set; }
 
-
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<AccountDto>()
                 .HasOne<UserDto>()
                 .WithMany()
                 .HasForeignKey(a => a.UserID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<CategoryDto>()
                 .HasOne<UserDto>()
                 .WithMany()
                 .HasForeignKey(c => c.UserID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<TransactionDto>()
                 .HasOne<UserDto>()
                 .WithMany()
                 .HasForeignKey(c => c.UserID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<TransactionDto>()
                 .HasOne<AccountDto>()
                 .WithMany()
                 .HasForeignKey(u => u.AccountID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<TransactionDto>()
                 .HasOne<CategoryDto>()
                 .WithMany()
                 .HasForeignKey(u => u.CategoryID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BudgetDto>()
-            .HasOne<UserDto>()
+                .HasOne<UserDto>()
                 .WithMany()
                 .HasForeignKey(b => b.UserID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BudgetItemDto>()
-            .HasOne<UserDto>()
+                .HasOne<UserDto>()
                 .WithMany()
                 .HasForeignKey(b => b.UserID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<BudgetItemDto>()
-            .HasOne<BudgetDto>()
+                .HasOne<BudgetDto>()
                 .WithMany()
                 .HasForeignKey(b => b.BudgetID)
-                .HasPrincipalKey(u => u.Id);
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
