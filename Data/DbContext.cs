@@ -15,6 +15,7 @@ namespace Craftmatrix.org.Data
         public DbSet<TransactionDto> Transactions { get; set; }
         public DbSet<BudgetDto> Budgets { get; set; }
         public DbSet<BudgetItemDto> BudgetItems { get; set; }
+        public DbSet<TransferDto> Transfers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +72,27 @@ namespace Craftmatrix.org.Data
                 .HasOne<BudgetDto>()
                 .WithMany()
                 .HasForeignKey(b => b.BudgetID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TransferDto>()
+                .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(t => t.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TransferDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.AccountID_A)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TransferDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.AccountID_B)
                 .HasPrincipalKey(u => u.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
