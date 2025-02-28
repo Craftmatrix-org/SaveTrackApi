@@ -4,6 +4,7 @@ using Craftmatrix.org.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SaveTrackApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250227220627_patched data type for credit")]
+    partial class patcheddatatypeforcredit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -162,38 +165,6 @@ namespace SaveTrackApi.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("Craftmatrix.org.Model.ReportDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Response")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("TimeStamp")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("Reports");
-                });
-
             modelBuilder.Entity("Craftmatrix.org.Model.TransactionDto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -285,78 +256,6 @@ namespace SaveTrackApi.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Craftmatrix.org.Model.WishListDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("ParentId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(65,30)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Url")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("WishLists");
-                });
-
-            modelBuilder.Entity("Craftmatrix.org.Model.WishListParentDto", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<Guid>("UserID")
-                        .HasColumnType("char(36)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserID");
-
-                    b.ToTable("WishListParents");
-                });
-
             modelBuilder.Entity("Craftmatrix.org.Model.AccountDto", b =>
                 {
                     b.HasOne("Craftmatrix.org.Model.UserDto", null)
@@ -399,15 +298,6 @@ namespace SaveTrackApi.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Craftmatrix.org.Model.ReportDto", b =>
-                {
-                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Craftmatrix.org.Model.TransactionDto", b =>
                 {
                     b.HasOne("Craftmatrix.org.Model.AccountDto", null)
@@ -444,30 +334,6 @@ namespace SaveTrackApi.Migrations
                         .IsRequired();
 
                     b.HasOne("Craftmatrix.org.Model.UserDto", null)
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Craftmatrix.org.Model.WishListDto", b =>
-                {
-                    b.HasOne("Craftmatrix.org.Model.WishListParentDto", null)
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
-                        .WithMany()
-                        .HasForeignKey("UserID")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Craftmatrix.org.Model.WishListParentDto", b =>
-                {
-                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
                         .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict)
