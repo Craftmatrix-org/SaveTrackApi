@@ -8,7 +8,7 @@ public class AccountDto
     public String Description { get; set; }
     public decimal InitValue { get; set; }
     public decimal? Limit { get; set; }
-    public Boolean isCredit { get; set; } = false;
+    public Boolean? isCredit { get; set; } = false;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
