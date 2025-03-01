@@ -40,6 +40,8 @@ namespace Craftmatrix.org.Controllers
                     Email = email,
                     Role = "User" // Assign a default role if null
                 };
+                user.CreatedAt = DateTime.UtcNow;
+                user.UpdatedAt = DateTime.UtcNow;
                 await _mysqlservice.PostDataAsync<UserDto>("Users", user);
             }
 
