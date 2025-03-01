@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SaveTrackApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250228192842_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250301014955_init system")]
+    partial class initsystem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,6 +277,10 @@ namespace SaveTrackApi.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("longtext");
 

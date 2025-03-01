@@ -42,12 +42,12 @@ namespace Craftmatrix.org.Controllers
                 await _mysqlservice.PostDataAsync<UserDto>("Users", user);
             }
 
-            var tokenString = GenerateToken(user.Email, user.Id.ToString());
+            var tokenString = GenerateToken(user.Email, user.Id.ToString(), user.Role);
 
             return Ok($"Bearer {tokenString}");
         }
 
-        private string GenerateToken(string email, string userId)
+        private string GenerateToken(string email, string userId, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET environment variable is not set."));
@@ -58,7 +58,7 @@ namespace Craftmatrix.org.Controllers
                 {
                     new Claim(JwtRegisteredClaimNames.Sub, email),
                     new Claim(JwtRegisteredClaimNames.Jti, userId),
-                    new Claim(ClaimTypes.Role, "User")
+                    new Claim(ClaimTypes.Role, role)
                 }),
                 Expires = DateTime.UtcNow.AddHours(1),
                 Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),

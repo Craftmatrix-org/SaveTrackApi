@@ -9,7 +9,7 @@ namespace Craftmatrix.org.Data
         {
         }
 
-        public DbSet<UserDto> Users { get; set; } = null!;
+        public DbSet<UserDto> Users { get; set; }
         public DbSet<AccountDto> Accounts { get; set; } = null!;
         public DbSet<CategoryDto> Categories { get; set; } = null!;
         public DbSet<TransactionDto> Transactions { get; set; } = null!;

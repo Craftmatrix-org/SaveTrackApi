@@ -82,8 +82,17 @@ namespace Craftmatrix.org.Services
             // Update the entity with the new values from the DTO
             _context.Entry(entity).CurrentValues.SetValues(dto);
 
-            // Save changes to the database
-            await _context.SaveChangesAsync();
+            try
+            {
+                // Save changes to the database
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log or handle the exception as needed
+                Console.WriteLine($"Error updating record in table '{tableName}' with ID '{id}': {ex.Message}");
+                throw;
+            }
 
             return dto;
         }
