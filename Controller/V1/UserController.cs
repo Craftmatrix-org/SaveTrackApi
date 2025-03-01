@@ -37,18 +37,23 @@ namespace Craftmatrix.org.Controllers
                 user = new UserDto
                 {
                     Id = Guid.NewGuid(),
-                    Email = email
+                    Email = email,
+                    Role = "User" // Assign a default role if null
                 };
                 await _mysqlservice.PostDataAsync<UserDto>("Users", user);
             }
 
-            var tokenString = GenerateToken(user.Email, user.Id.ToString(), user.Role);
+            var tokenString = GenerateToken(user.Email, user.Id.ToString(), user.Role ?? "User");
 
             return Ok($"Bearer {tokenString}");
         }
 
         private string GenerateToken(string email, string userId, string role)
         {
+            if (string.IsNullOrEmpty(email)) throw new ArgumentNullException(nameof(email));
+            if (string.IsNullOrEmpty(userId)) throw new ArgumentNullException(nameof(userId));
+            if (string.IsNullOrEmpty(role)) throw new ArgumentNullException(nameof(role));
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET environment variable is not set."));
 

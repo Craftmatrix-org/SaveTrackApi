@@ -92,7 +92,8 @@ builder.Services.AddCors(options =>
                       {
                           policy.WithOrigins("http://localhost:7000", "https://savetrackdev.craftmatrix.org", "https://savetrack.craftmatrix.org")
                                 .AllowAnyHeader()
-                                .AllowAnyMethod();
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                       });
 });
 
@@ -122,7 +123,7 @@ var app = builder.Build();
 app.UseCors(Origin);
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI(options =>
@@ -138,5 +139,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.UseStaticFiles();
 
 app.Run();
