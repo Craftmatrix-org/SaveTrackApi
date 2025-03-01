@@ -10,15 +10,15 @@ namespace Craftmatrix.org.Data
         }
 
         public DbSet<UserDto> Users { get; set; }
-        public DbSet<AccountDto> Accounts { get; set; }
-        public DbSet<CategoryDto> Categories { get; set; }
-        public DbSet<TransactionDto> Transactions { get; set; }
-        public DbSet<BudgetDto> Budgets { get; set; }
-        public DbSet<BudgetItemDto> BudgetItems { get; set; }
-        public DbSet<TransferDto> Transfers { get; set; }
-        public DbSet<ReportDto> Reports { get; set; }
-        public DbSet<WishListParentDto> WishListParents { get; set; }
-        public DbSet<WishListDto> WishLists { get; set; }
+        public DbSet<AccountDto> Accounts { get; set; } = null!;
+        public DbSet<CategoryDto> Categories { get; set; } = null!;
+        public DbSet<TransactionDto> Transactions { get; set; } = null!;
+        public DbSet<BudgetDto> Budgets { get; set; } = null!;
+        public DbSet<BudgetItemDto> BudgetItems { get; set; } = null!;
+        public DbSet<TransferDto> Transfers { get; set; } = null!;
+        public DbSet<ReportDto> Reports { get; set; } = null!;
+        public DbSet<WishListParentDto> WishListParents { get; set; } = null!;
+        public DbSet<WishListDto> WishLists { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

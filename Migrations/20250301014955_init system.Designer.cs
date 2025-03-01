@@ -3,7 +3,6 @@ using System;
 using Craftmatrix.org.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,18 +11,16 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SaveTrackApi.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250227223738_Added Wishlists and reports")]
-    partial class AddedWishlistsandreports
+    [Migration("20250301014955_init system")]
+    partial class initsystem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Craftmatrix.org.Model.AccountDto", b =>
                 {
@@ -280,6 +277,10 @@ namespace SaveTrackApi.Migrations
                         .HasColumnType("char(36)");
 
                     b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("longtext");
 

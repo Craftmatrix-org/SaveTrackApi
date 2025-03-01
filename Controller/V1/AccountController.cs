@@ -13,12 +13,10 @@ namespace Craftmatrix.org.Controllers
     public class AccountController : ControllerBase
     {
         private readonly MySQLService _mysqlservice;
-        private readonly JwtService _jwtService;
 
-        public AccountController(JwtService jwtService, MySQLService mySQLService)
+        public AccountController(MySQLService mySQLService)
         {
             _mysqlservice = mySQLService;
-            _jwtService = jwtService;
         }
 
         [HttpGet]
