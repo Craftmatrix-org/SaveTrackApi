@@ -5,39 +5,43 @@
 namespace SaveTrackApi.Migrations
 {
     /// <inheritdoc />
-    public partial class RemovingNameandfocusingonDescriptionwhichisalsonullableforTransactionDTO : Migration
+    public partial class nullablecredit : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Name",
-                table: "Transactions");
-
             migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "Transactions",
+                name: "Role",
+                table: "Users",
                 type: "longtext",
                 nullable: true,
                 oldClrType: typeof(string),
                 oldType: "longtext")
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .OldAnnotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.AlterColumn<bool>(
+                name: "isCredit",
+                table: "Accounts",
+                type: "tinyint(1)",
+                nullable: true,
+                oldClrType: typeof(bool),
+                oldType: "tinyint(1)");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.UpdateData(
-                table: "Transactions",
-                keyColumn: "Description",
+                table: "Users",
+                keyColumn: "Role",
                 keyValue: null,
-                column: "Description",
+                column: "Role",
                 value: "");
 
             migrationBuilder.AlterColumn<string>(
-                name: "Description",
-                table: "Transactions",
+                name: "Role",
+                table: "Users",
                 type: "longtext",
                 nullable: false,
                 oldClrType: typeof(string),
@@ -46,12 +50,15 @@ namespace SaveTrackApi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4")
                 .OldAnnotation("MySql:CharSet", "utf8mb4");
 
-            migrationBuilder.AddColumn<string>(
-                name: "Name",
-                table: "Transactions",
-                type: "longtext",
-                nullable: false)
-                .Annotation("MySql:CharSet", "utf8mb4");
+            migrationBuilder.AlterColumn<bool>(
+                name: "isCredit",
+                table: "Accounts",
+                type: "tinyint(1)",
+                nullable: false,
+                defaultValue: false,
+                oldClrType: typeof(bool),
+                oldType: "tinyint(1)",
+                oldNullable: true);
         }
     }
 }

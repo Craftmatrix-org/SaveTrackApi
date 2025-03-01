@@ -10,11 +10,15 @@ namespace Craftmatrix.org.Data
         }
 
         public DbSet<UserDto> Users { get; set; }
-        public DbSet<AccountDto> Accounts { get; set; }
-        public DbSet<CategoryDto> Categories { get; set; }
-        public DbSet<TransactionDto> Transactions { get; set; }
-        public DbSet<BudgetDto> Budgets { get; set; }
-        public DbSet<BudgetItemDto> BudgetItems { get; set; }
+        public DbSet<AccountDto> Accounts { get; set; } = null!;
+        public DbSet<CategoryDto> Categories { get; set; } = null!;
+        public DbSet<TransactionDto> Transactions { get; set; } = null!;
+        public DbSet<BudgetDto> Budgets { get; set; } = null!;
+        public DbSet<BudgetItemDto> BudgetItems { get; set; } = null!;
+        public DbSet<TransferDto> Transfers { get; set; } = null!;
+        public DbSet<ReportDto> Reports { get; set; } = null!;
+        public DbSet<WishListParentDto> WishListParents { get; set; } = null!;
+        public DbSet<WishListDto> WishLists { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -71,6 +75,55 @@ namespace Craftmatrix.org.Data
                 .HasOne<BudgetDto>()
                 .WithMany()
                 .HasForeignKey(b => b.BudgetID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TransferDto>()
+                .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(t => t.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TransferDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.AccountID_A)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TransferDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.AccountID_B)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<ReportDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WishListParentDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WishListDto>()
+                .HasOne<AccountDto>()
+                .WithMany()
+                .HasForeignKey(t => t.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<WishListDto>()
+                .HasOne<WishListParentDto>()
+                .WithMany()
+                .HasForeignKey(t => t.ParentId)
                 .HasPrincipalKey(u => u.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }

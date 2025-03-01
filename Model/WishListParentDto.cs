@@ -1,10 +1,11 @@
 namespace Craftmatrix.org.Model
 {
-    public class UserDto
+    public class WishListParentDto
     {
         public Guid Id { get; set; }
-        public string Email { get; set; }
-        public string? Role { get; set; } = "regular";
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public Guid UserID { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

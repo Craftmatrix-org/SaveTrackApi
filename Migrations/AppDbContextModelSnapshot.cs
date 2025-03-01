@@ -3,7 +3,6 @@ using System;
 using Craftmatrix.org.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -17,10 +16,8 @@ namespace SaveTrackApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
             modelBuilder.Entity("Craftmatrix.org.Model.AccountDto", b =>
                 {
@@ -42,11 +39,17 @@ namespace SaveTrackApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<decimal?>("Limit")
+                        .HasColumnType("decimal(65,30)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<Guid>("UserID")
                         .HasColumnType("char(36)");
+
+                    b.Property<bool?>("isCredit")
+                        .HasColumnType("tinyint(1)");
 
                     b.HasKey("Id");
 
@@ -156,6 +159,38 @@ namespace SaveTrackApi.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("Craftmatrix.org.Model.ReportDto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Response")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("TimeStamp")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Reports");
+                });
+
             modelBuilder.Entity("Craftmatrix.org.Model.TransactionDto", b =>
                 {
                     b.Property<Guid>("Id")
@@ -194,19 +229,138 @@ namespace SaveTrackApi.Migrations
                     b.ToTable("Transactions");
                 });
 
+            modelBuilder.Entity("Craftmatrix.org.Model.TransferDto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AccountID_A")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AccountID_B")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountID_A");
+
+                    b.HasIndex("AccountID_B");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("Transfers");
+                });
+
             modelBuilder.Entity("Craftmatrix.org.Model.UserDto", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Role")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("Craftmatrix.org.Model.WishListDto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(65,30)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("WishLists");
+                });
+
+            modelBuilder.Entity("Craftmatrix.org.Model.WishListParentDto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserID");
+
+                    b.ToTable("WishListParents");
                 });
 
             modelBuilder.Entity("Craftmatrix.org.Model.AccountDto", b =>
@@ -251,6 +405,15 @@ namespace SaveTrackApi.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Craftmatrix.org.Model.ReportDto", b =>
+                {
+                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Craftmatrix.org.Model.TransactionDto", b =>
                 {
                     b.HasOne("Craftmatrix.org.Model.AccountDto", null)
@@ -266,6 +429,51 @@ namespace SaveTrackApi.Migrations
                         .IsRequired();
 
                     b.HasOne("Craftmatrix.org.Model.UserDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Craftmatrix.org.Model.TransferDto", b =>
+                {
+                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
+                        .WithMany()
+                        .HasForeignKey("AccountID_A")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
+                        .WithMany()
+                        .HasForeignKey("AccountID_B")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Craftmatrix.org.Model.UserDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Craftmatrix.org.Model.WishListDto", b =>
+                {
+                    b.HasOne("Craftmatrix.org.Model.WishListParentDto", null)
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
+                        .WithMany()
+                        .HasForeignKey("UserID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Craftmatrix.org.Model.WishListParentDto", b =>
+                {
+                    b.HasOne("Craftmatrix.org.Model.AccountDto", null)
                         .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Restrict)

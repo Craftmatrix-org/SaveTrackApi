@@ -1,21 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Craftmatrix.org.Services;
 using Craftmatrix.org.Model;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace Craftmatrix.org.Controllers
 {
     [ApiController]
     [ApiVersion("1.0")]
+    [Authorize]
     [Route("api/v{version:apiVersion}/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly MySQLService _mysqlservice;
-        private readonly JwtService _jwtService;
 
-        public AccountController(JwtService jwtService, MySQLService mySQLService)
+        public AccountController(MySQLService mySQLService)
         {
             _mysqlservice = mySQLService;
-            _jwtService = jwtService;
         }
 
         [HttpGet]
