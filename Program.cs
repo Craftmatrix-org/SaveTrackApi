@@ -92,7 +92,8 @@ builder.Services.AddCors(options =>
                       {
                           policy.WithOrigins("http://localhost:7000", "https://savetrackdev.craftmatrix.org", "https://savetrack.craftmatrix.org")
                                 .AllowAnyHeader()
-                                .AllowAnyMethod();
+                                .AllowAnyMethod()
+                                .AllowCredentials();
                       });
 });
 
