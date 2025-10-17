@@ -7,7 +7,7 @@ namespace Craftmatrix.org.Controllers
         [HttpGet("health")]
         public IActionResult HealthCheck()
         {
-            return Ok("Healthy");
+            return Ok(new { status = "Healthy" });
         }
     }
 }
