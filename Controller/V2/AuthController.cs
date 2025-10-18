@@ -114,7 +114,7 @@ namespace Craftmatrix.org.V2.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, userId),
                     new Claim(ClaimTypes.Role, role)
                 }),
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddYears(1),
                 Audience = "savetrack",
                 Issuer = "craftmatrix.org",
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
