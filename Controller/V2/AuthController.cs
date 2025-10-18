@@ -104,7 +104,7 @@ namespace Craftmatrix.org.V2.Controllers
         private string GenerateToken(string email, string userId, string role)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_jwtSecret);
+            var key = Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? throw new InvalidOperationException("JWT_SECRET environment variable is not set."));
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {
