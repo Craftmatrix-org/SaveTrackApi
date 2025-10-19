@@ -19,6 +19,9 @@ namespace Craftmatrix.org.Data
         public DbSet<ReportDto> Reports { get; set; } = null!;
         public DbSet<WishListParentDto> WishListParents { get; set; } = null!;
         public DbSet<WishListDto> WishLists { get; set; } = null!;
+        public DbSet<BillDto> Bills { get; set; } = null!;
+        public DbSet<InsightDto> Insights { get; set; } = null!;
+        public DbSet<ChartDataDto> ChartData { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -124,6 +127,37 @@ namespace Craftmatrix.org.Data
                 .HasOne<WishListParentDto>()
                 .WithMany()
                 .HasForeignKey(t => t.ParentId)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Bills relationships
+            modelBuilder.Entity<BillDto>()
+                .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(b => b.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<BillDto>()
+                .HasOne<CategoryDto>()
+                .WithMany()
+                .HasForeignKey(b => b.CategoryID)
+                .HasPrincipalKey(c => c.Id)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            // Insights relationships
+            modelBuilder.Entity<InsightDto>()
+                .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(i => i.UserID)
+                .HasPrincipalKey(u => u.Id)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Chart data relationships
+            modelBuilder.Entity<ChartDataDto>()
+                .HasOne<UserDto>()
+                .WithMany()
+                .HasForeignKey(c => c.UserID)
                 .HasPrincipalKey(u => u.Id)
                 .OnDelete(DeleteBehavior.Restrict);
         }
