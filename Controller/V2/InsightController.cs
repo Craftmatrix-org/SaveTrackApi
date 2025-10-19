@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Craftmatrix.org.Data;
 using Craftmatrix.org.Model;
 using Craftmatrix.org.Services;
 using System.Security.Claims;
@@ -15,12 +13,12 @@ namespace Craftmatrix.org.Controller.V2
     [Authorize]
     public class InsightController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly MySQLService _db;
         private readonly GeminiService _geminiService;
 
-        public InsightController(AppDbContext context, GeminiService geminiService)
+        public InsightController(MySQLService db, GeminiService geminiService)
         {
-            _context = context;
+            _db = db;
             _geminiService = geminiService;
         }
 
@@ -40,7 +38,8 @@ namespace Craftmatrix.org.Controller.V2
                 // If it's an email, look up the user in the database
                 if (subjectClaim.Contains("@"))
                 {
-                    var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == subjectClaim);
+                    var users = await _db.GetDataAsync<UserDto>("Users");
+                    var user = users.FirstOrDefault(u => u.Email == subjectClaim);
                     if (user != null)
                     {
                         return user.Id;
@@ -60,25 +59,25 @@ namespace Craftmatrix.org.Controller.V2
         public async Task<ActionResult<IEnumerable<InsightDto>>> GetInsights()
         {
             var userId = await GetUserIdAsync();
-            var insights = await _context.Insights
-                .Where(i => i.UserID == userId)
+            var insights = await _db.GetDataAsync<InsightDto>("Insights");
+            var userInsights = insights.Where(i => i.UserID == userId)
                 .OrderByDescending(i => i.CreatedAt)
                 .Take(20)
-                .ToListAsync();
+                .ToList();
 
-            return Ok(insights);
+            return Ok(userInsights);
         }
 
         [HttpGet("unread")]
         public async Task<ActionResult<IEnumerable<InsightDto>>> GetUnreadInsights()
         {
             var userId = await GetUserIdAsync();
-            var insights = await _context.Insights
-                .Where(i => i.UserID == userId && !i.IsRead)
+            var insights = await _db.GetDataAsync<InsightDto>("Insights");
+            var unreadInsights = insights.Where(i => i.UserID == userId && !i.IsRead)
                 .OrderByDescending(i => i.CreatedAt)
-                .ToListAsync();
+                .ToList();
 
-            return Ok(insights);
+            return Ok(unreadInsights);
         }
 
         [HttpPost("generate/spending-analysis")]
@@ -87,15 +86,14 @@ namespace Craftmatrix.org.Controller.V2
             var userId = await GetUserIdAsync();
             
             // Get recent transactions and categories
-            var transactions = await _context.Transactions
-                .Where(t => t.UserID == userId)
+            var allTransactions = await _db.GetDataAsync<TransactionDto>("Transactions");
+            var transactions = allTransactions.Where(t => t.UserID == userId)
                 .OrderByDescending(t => t.CreatedAt)
                 .Take(50)
-                .ToListAsync();
+                .ToList();
 
-            var categories = await _context.Categories
-                .Where(c => c.UserID == userId)
-                .ToListAsync();
+            var allCategories = await _db.GetDataAsync<CategoryDto>("Categories");
+            var categories = allCategories.Where(c => c.UserID == userId).ToList();
 
             if (!transactions.Any())
             {
@@ -121,8 +119,7 @@ namespace Craftmatrix.org.Controller.V2
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Insights.Add(insight);
-                await _context.SaveChangesAsync();
+                await _db.PostDataAsync("Insights", insight);
 
                 return Ok(insight);
             }
@@ -138,16 +135,16 @@ namespace Craftmatrix.org.Controller.V2
             var userId = await GetUserIdAsync();
             
             // Get current budget and recent transactions
-            var budget = await _context.Budgets
-                .Where(b => b.UserID == userId)
+            var allBudgets = await _db.GetDataAsync<BudgetDto>("Budgets");
+            var budget = allBudgets.Where(b => b.UserID == userId)
                 .OrderByDescending(b => b.CreatedAt)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
-            var transactions = await _context.Transactions
-                .Where(t => t.UserID == userId)
+            var allTransactions = await _db.GetDataAsync<TransactionDto>("Transactions");
+            var transactions = allTransactions.Where(t => t.UserID == userId)
                 .OrderByDescending(t => t.CreatedAt)
                 .Take(30)
-                .ToListAsync();
+                .ToList();
 
             if (budget == null)
             {
@@ -170,8 +167,7 @@ namespace Craftmatrix.org.Controller.V2
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Insights.Add(insight);
-                await _context.SaveChangesAsync();
+                await _db.PostDataAsync("Insights", insight);
 
                 return Ok(insight);
             }
@@ -187,18 +183,16 @@ namespace Craftmatrix.org.Controller.V2
             var userId = await GetUserIdAsync();
             
             // Get categories and recent transactions 
-            var categories = await _context.Categories
-                .Where(c => c.UserID == userId)
-                .ToListAsync();
+            var allCategories = await _db.GetDataAsync<CategoryDto>("Categories");
+            var categories = allCategories.Where(c => c.UserID == userId).ToList();
 
             var currentMonth = DateTime.UtcNow.Month;
             var currentYear = DateTime.UtcNow.Year;
             
-            var transactions = await _context.Transactions
-                .Where(t => t.UserID == userId && 
+            var allTransactions = await _db.GetDataAsync<TransactionDto>("Transactions");
+            var transactions = allTransactions.Where(t => t.UserID == userId && 
                            t.CreatedAt.Month == currentMonth && 
-                           t.CreatedAt.Year == currentYear)
-                .ToListAsync();
+                           t.CreatedAt.Year == currentYear).ToList();
 
             if (!categories.Any())
             {
@@ -224,8 +218,7 @@ namespace Craftmatrix.org.Controller.V2
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Insights.Add(insight);
-                await _context.SaveChangesAsync();
+                await _db.PostDataAsync("Insights", insight);
 
                 return Ok(new[] { insight });
             }
@@ -241,19 +234,17 @@ namespace Craftmatrix.org.Controller.V2
             var userId = await GetUserIdAsync();
             
             // Get wishlist goals, recent transactions, and accounts
-            var wishlist = await _context.WishLists
-                .Where(w => w.UserID == userId)
-                .ToListAsync();
+            var allWishlists = await _db.GetDataAsync<WishListDto>("WishLists");
+            var wishlist = allWishlists.Where(w => w.UserID == userId).ToList();
 
-            var transactions = await _context.Transactions
-                .Where(t => t.UserID == userId)
+            var allTransactions = await _db.GetDataAsync<TransactionDto>("Transactions");
+            var transactions = allTransactions.Where(t => t.UserID == userId)
                 .OrderByDescending(t => t.CreatedAt)
                 .Take(30)
-                .ToListAsync();
+                .ToList();
 
-            var accounts = await _context.Accounts
-                .Where(a => a.UserID == userId)
-                .ToListAsync();
+            var allAccounts = await _db.GetDataAsync<AccountDto>("Accounts");
+            var accounts = allAccounts.Where(a => a.UserID == userId).ToList();
 
             if (!wishlist.Any())
             {
@@ -280,8 +271,7 @@ namespace Craftmatrix.org.Controller.V2
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Insights.Add(insight);
-                await _context.SaveChangesAsync();
+                await _db.PostDataAsync("Insights", insight);
 
                 return Ok(insight);
             }
@@ -295,8 +285,8 @@ namespace Craftmatrix.org.Controller.V2
         public async Task<IActionResult> MarkAsRead(int id)
         {
             var userId = await GetUserIdAsync();
-            var insight = await _context.Insights
-                .FirstOrDefaultAsync(i => i.Id == id && i.UserID == userId);
+            var allInsights = await _db.GetDataAsync<InsightDto>("Insights");
+            var insight = allInsights.FirstOrDefault(i => i.Id == id && i.UserID == userId);
 
             if (insight == null)
             {
@@ -304,7 +294,7 @@ namespace Craftmatrix.org.Controller.V2
             }
 
             insight.IsRead = true;
-            await _context.SaveChangesAsync();
+            await _db.PutDataAsync("Insights", id, insight);
 
             return NoContent();
         }
@@ -313,16 +303,15 @@ namespace Craftmatrix.org.Controller.V2
         public async Task<IActionResult> DeleteInsight(int id)
         {
             var userId = await GetUserIdAsync();
-            var insight = await _context.Insights
-                .FirstOrDefaultAsync(i => i.Id == id && i.UserID == userId);
+            var allInsights = await _db.GetDataAsync<InsightDto>("Insights");
+            var insight = allInsights.FirstOrDefault(i => i.Id == id && i.UserID == userId);
 
             if (insight == null)
             {
                 return NotFound();
             }
 
-            _context.Insights.Remove(insight);
-            await _context.SaveChangesAsync();
+            await _db.DeleteDataAsync("Insights", id);
 
             return NoContent();
         }
