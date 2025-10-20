@@ -25,6 +25,7 @@ string connectionString = $"Server={dbHost};Port={dbPort};Database={dbName};User
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<MySQLService>();
+builder.Services.AddScoped<GeminiService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 33))));
