@@ -1,5 +1,3 @@
-using Google.Cloud.AIPlatform.V1;
-using Google.Protobuf.WellKnownTypes;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -7,34 +5,65 @@ namespace Craftmatrix.org.Services
 {
     public class GeminiService
     {
-        private readonly PredictionServiceClient _client;
-        private readonly string _projectId;
-        private readonly string _location;
+        private readonly HttpClient _httpClient;
+        private readonly string _apiKey;
         private readonly string _model;
 
         public GeminiService(IConfiguration configuration)
         {
-            _projectId = configuration["Google:ProjectId"] ?? "craftmatrix-ai";
-            _location = configuration["Google:Location"] ?? "us-central1";
+            _apiKey = Environment.GetEnvironmentVariable("GOOGLE_API_KEY") ?? 
+                     throw new ArgumentNullException("GOOGLE_API_KEY environment variable is required");
             _model = configuration["Google:Model"] ?? "gemini-1.5-flash";
             
-            // Initialize the Prediction Service Client
-            _client = PredictionServiceClient.Create();
+            _httpClient = new HttpClient();
+            _httpClient.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
         }
 
         public async Task<string> GenerateFinancialInsightAsync(FinancialData data, string insightType)
         {
             var prompt = BuildPrompt(data, insightType);
-            var request = CreatePredictionRequest(prompt);
             
             try
             {
-                var response = await _client.PredictAsync(request);
-                return ExtractTextFromResponse(response);
+                var requestBody = new
+                {
+                    contents = new[]
+                    {
+                        new
+                        {
+                            parts = new[]
+                            {
+                                new { text = prompt }
+                            }
+                        }
+                    },
+                    generationConfig = new
+                    {
+                        temperature = 0.7,
+                        topK = 40,
+                        topP = 0.8,
+                        maxOutputTokens = 150
+                    }
+                };
+
+                var json = JsonConvert.SerializeObject(requestBody);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"v1beta/models/{_model}:generateContent?key={_apiKey}", content);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    return ExtractTextFromResponse(responseContent);
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return $"Unable to generate insight. API Error: {response.StatusCode} - {errorContent}";
+                }
             }
             catch (Exception ex)
             {
-                // Log the error and return a fallback message
                 return $"Unable to generate insight at this time. Please try again later. ({ex.Message})";
             }
         }
@@ -139,60 +168,36 @@ namespace Craftmatrix.org.Services
             return prompt.ToString();
         }
 
-        private PredictRequest CreatePredictionRequest(string prompt)
-        {
-            var endpoint = EndpointName.FromProjectLocationEndpoint(_projectId, _location, _model);
-            
-            var instance = new Google.Protobuf.WellKnownTypes.Value
-            {
-                StructValue = new Struct
-                {
-                    Fields =
-                    {
-                        ["prompt"] = Google.Protobuf.WellKnownTypes.Value.ForString(prompt),
-                        ["max_output_tokens"] = Google.Protobuf.WellKnownTypes.Value.ForNumber(150),
-                        ["temperature"] = Google.Protobuf.WellKnownTypes.Value.ForNumber(0.7),
-                        ["top_p"] = Google.Protobuf.WellKnownTypes.Value.ForNumber(0.8),
-                        ["top_k"] = Google.Protobuf.WellKnownTypes.Value.ForNumber(40)
-                    }
-                }
-            };
-
-            return new PredictRequest
-            {
-                Endpoint = endpoint.ToString(),
-                Instances = { instance }
-            };
-        }
-
-        private string ExtractTextFromResponse(PredictResponse response)
+        private string ExtractTextFromResponse(string responseJson)
         {
             try
             {
-                if (response.Predictions.Count > 0)
+                dynamic response = JsonConvert.DeserializeObject(responseJson);
+                
+                if (response?.candidates?.Count > 0)
                 {
-                    var prediction = response.Predictions[0];
-                    if (prediction.StructValue.Fields.ContainsKey("content"))
+                    var candidate = response.candidates[0];
+                    if (candidate?.content?.parts?.Count > 0)
                     {
-                        return prediction.StructValue.Fields["content"].StringValue;
-                    }
-                    
-                    // Fallback: try to extract text from any string field
-                    foreach (var field in prediction.StructValue.Fields.Values)
-                    {
-                        if (!string.IsNullOrEmpty(field.StringValue))
+                        var part = candidate.content.parts[0];
+                        if (part?.text != null)
                         {
-                            return field.StringValue;
+                            return part.text.ToString();
                         }
                     }
                 }
                 
                 return "I'm having trouble generating insights right now. Please try again later.";
             }
-            catch
+            catch (Exception ex)
             {
-                return "Unable to process financial insight at this time.";
+                return $"Unable to process financial insight at this time. Error: {ex.Message}";
             }
+        }
+
+        public void Dispose()
+        {
+            _httpClient?.Dispose();
         }
     }
 
