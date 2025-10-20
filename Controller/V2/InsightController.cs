@@ -281,6 +281,115 @@ namespace Craftmatrix.org.Controller.V2
             }
         }
 
+        [HttpPost("generate")]
+        public async Task<ActionResult<InsightDto>> GenerateInsight([FromBody] GenerateInsightRequest request)
+        {
+            var userId = await GetUserIdAsync();
+            
+            try
+            {
+                var allTransactions = await _db.GetDataAsync<TransactionDto>("Transactions");
+                var transactions = allTransactions.Where(t => t.UserID == userId)
+                    .OrderByDescending(t => t.CreatedAt)
+                    .Take(30)
+                    .ToList();
+
+                var allCategories = await _db.GetDataAsync<CategoryDto>("Categories");
+                var categories = allCategories.Where(c => c.UserID == userId).ToList();
+
+                var allAccounts = await _db.GetDataAsync<AccountDto>("Accounts");
+                var accounts = allAccounts.Where(a => a.UserID == userId).ToList();
+
+                string aiInsight;
+                string title;
+                string type = "analysis";
+                string priority = "medium";
+
+                switch (request.Category?.ToLower())
+                {
+                    case "spending":
+                        aiInsight = await _geminiService.AnalyzeSpendingPatternsAsync(
+                            transactions.Cast<object>().ToList(),
+                            categories.Cast<object>().ToList()
+                        );
+                        title = "Spending Pattern Analysis";
+                        break;
+                    
+                    case "budget":
+                        var allBudgets = await _db.GetDataAsync<BudgetDto>("Budgets");
+                        var budget = allBudgets.Where(b => b.UserID == userId)
+                            .OrderByDescending(b => b.CreatedAt)
+                            .FirstOrDefault();
+                        
+                        if (budget == null)
+                        {
+                            return BadRequest("No budget found. Create a budget first to get personalized advice.");
+                        }
+                        
+                        aiInsight = await _geminiService.GenerateBudgetAdviceAsync(budget, transactions.Cast<object>().ToList());
+                        title = "Budget Optimization Advice";
+                        type = "suggestion";
+                        priority = "high";
+                        break;
+                    
+                    case "goal":
+                    case "savings":
+                        var allWishlists = await _db.GetDataAsync<WishListDto>("WishLists");
+                        var wishlist = allWishlists.Where(w => w.UserID == userId).ToList();
+                        
+                        if (!wishlist.Any())
+                        {
+                            return BadRequest("No savings goals found. Add items to your wishlist to get personalized savings advice.");
+                        }
+                        
+                        aiInsight = await _geminiService.GenerateSavingsAdviceAsync(
+                            wishlist.Cast<object>().ToList(),
+                            transactions.Cast<object>().ToList(),
+                            accounts
+                        );
+                        title = "Savings Goal Advice";
+                        type = "tip";
+                        break;
+                    
+                    default:
+                        // General financial insight based on the question
+                        if (string.IsNullOrEmpty(request.Question))
+                        {
+                            return BadRequest("Please provide a question or specify a category (spending, budget, goal).");
+                        }
+                        
+                        aiInsight = await _geminiService.AnalyzeFinancialQuestionAsync(
+                            request.Question,
+                            transactions.Cast<object>().ToList(),
+                            categories.Cast<object>().ToList(),
+                            accounts
+                        );
+                        title = "Financial Analysis";
+                        break;
+                }
+
+                var insight = new InsightDto
+                {
+                    UserID = userId,
+                    Type = type,
+                    Title = title,
+                    Content = aiInsight,
+                    Priority = priority,
+                    Category = request.Category ?? "general",
+                    AIProvider = "Google Gemini",
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                await _db.PostDataAsync("Insights", insight);
+
+                return Ok(insight);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error generating insight: {ex.Message}");
+            }
+        }
+
         [HttpPatch("{id}/read")]
         public async Task<IActionResult> MarkAsRead(int id)
         {

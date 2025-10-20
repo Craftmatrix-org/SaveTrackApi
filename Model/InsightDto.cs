@@ -44,4 +44,10 @@ namespace Craftmatrix.org.Model
         
         public decimal? ConfidenceScore { get; set; }
     }
+
+    public class GenerateInsightRequest
+    {
+        public string? Category { get; set; } // spending, budget, goal/savings, general
+        public string? Question { get; set; } // User's specific question
+    }
 }

@@ -117,6 +117,20 @@ namespace Craftmatrix.org.Services
             return await GenerateFinancialInsightAsync(data, "savings_tip");
         }
 
+        public async Task<string> AnalyzeFinancialQuestionAsync(string question, List<object> transactions, List<object> categories, object accounts)
+        {
+            var data = new FinancialData
+            {
+                Transactions = transactions,
+                Categories = categories,
+                Accounts = accounts,
+                AnalysisType = "general_question",
+                UserQuestion = question
+            };
+
+            return await GenerateFinancialInsightAsync(data, "general_analysis");
+        }
+
         private string BuildPrompt(FinancialData data, string insightType)
         {
             var prompt = new StringBuilder();
@@ -157,6 +171,15 @@ namespace Craftmatrix.org.Services
                     prompt.AppendLine($"TRANSACTIONS: {JsonConvert.SerializeObject(data.Transactions)}");
                     prompt.AppendLine($"ACCOUNTS: {JsonConvert.SerializeObject(data.Accounts)}");
                     prompt.AppendLine("Suggest ways to reach savings goals based on spending patterns.");
+                    break;
+
+                case "general_analysis":
+                    prompt.AppendLine("TASK: Answer the user's financial question using their data.");
+                    prompt.AppendLine($"USER QUESTION: {data.UserQuestion}");
+                    prompt.AppendLine($"TRANSACTIONS: {JsonConvert.SerializeObject(data.Transactions)}");
+                    prompt.AppendLine($"CATEGORIES: {JsonConvert.SerializeObject(data.Categories)}");
+                    prompt.AppendLine($"ACCOUNTS: {JsonConvert.SerializeObject(data.Accounts)}");
+                    prompt.AppendLine("Analyze their financial data to provide a personalized answer to their question.");
                     break;
 
                 default:
@@ -209,5 +232,6 @@ namespace Craftmatrix.org.Services
         public List<object>? Wishlist { get; set; }
         public object? Accounts { get; set; }
         public string AnalysisType { get; set; } = "";
+        public string? UserQuestion { get; set; }
     }
 }
